@@ -1,0 +1,27 @@
+{
+  "name": "electron-asar-hot-updater",
+  "version": "0.0.1",
+  "description": "Handles Electron app.asar updates.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yansenlei/electron-asar-hot-updater"
+  },
+  "keywords": [
+    "electron",
+    "asar",
+    "atom shell",
+    "update",
+    "updater"
+  ],
+  "author": "leiyswork@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "original-fs": "^1.0.0",
+    "request": "^2.87.0",
+    "request-progress": "^3.0.0"
+  }
+}
