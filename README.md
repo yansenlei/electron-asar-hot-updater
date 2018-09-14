@@ -1,4 +1,6 @@
-# What it is
+# electron-asar-hot-updater
+[![NPM](https://nodei.co/npm/electron-asar-hot-updater.png)](https://nodei.co/npm/electron-asar-hot-updater/)
+## What it is
 > A NodeJs module for Electron, that handles app.asar updates. Reconstruction of `electron-asar-updater`
 
 ## How it works (Read this first)
@@ -15,8 +17,9 @@
 https://www.npmjs.com/package/electron-updater
 http://electron.atom.io/docs/v0.33.0/api/auto-updater/
 * If you don't think it's reasonable to update the hole .app or .exe file (up to 100MB) when you're only changing one file (usually 40MB).
-* If you want to see progress when updating.
-* If you want to check the version on the server side or on the client side.
+* If you want to see `progress` when updating.
+* If you want to `check` the version on the `server side` or on the `client side`.
+* If you want to use `zip` to compress files, make your ASAR file smaller.
 
 ---
 
@@ -43,37 +46,29 @@ app.on('ready', function () {
       return false
     }
 
-    var apply = confirm("New Update Available.\nWould you like to update?");
-    if (apply == true) {
-      EAU.progress(function (state) {
-        // The state is an object that looks like this:
-        // {
-        //     percent: 0.5,               
-        //     speed: 554732,              
-        //     size: {
-        //         total: 90044871,        
-        //         transferred: 27610959   
-        //     },
-        //     time: {
-        //         elapsed: 36.235,        
-        //         remaining: 81.403       
-        //     }
-        // }
-      })
+    EAU.progress(function (state) {
+      // The state is an object that looks like this:
+      // {
+      //     percent: 0.5,               
+      //     speed: 554732,              
+      //     size: {
+      //         total: 90044871,        
+      //         transferred: 27610959   
+      //     },
+      //     time: {
+      //         elapsed: 36.235,        
+      //         remaining: 81.403       
+      //     }
+      // }
+    })
 
-      EAU.download(function (error) {
-        if (error) {
-          dialog.showErrorBox('info', error)
-          return false
-        }
-        dialog.showErrorBox('info', 'App updated successfully! Restart it please.')
-        app.relaunch()
-        app.quit()
-      })
-
-    } else {
-      return false;
-    }
+    EAU.download(function (error) {
+      if (error) {
+        dialog.showErrorBox('info', error)
+        return false
+      }
+      dialog.showErrorBox('info', 'App updated successfully! Restart it please.')
+    })
 
   })
 })
@@ -90,7 +85,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 var desktop_app_version = '1.0.0';
-var desktop_app_URL = 'http://127.0.0.1:8083/update.asar'
+var desktop_app_URL = 'http://127.0.0.1:8083/update.asar' // or ../update.zip
 
 app.post('/update', function (req, res) {
   if(req.body && req.body.current != desktop_app_version){ // check for server side
@@ -116,3 +111,14 @@ app.post('/update', function (req, res) {
   res.end();
 });
 ```
+If you use a zip file, the plug-in will unzip the file after downloading it, which will make your update file smaller (50M - > 10M), but you must make sure that update ASAR is at the root of the zip package.:
+```
+── update.zip
+   └── update.asar
+```
+
+## License
+
+:smiley: if you have any comments or wish to contribute to this project, you are welcome to submit Issues or PR.
+
+MIT - [yansenlei](https://github.com/yansenlei)

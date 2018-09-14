@@ -1,6 +1,6 @@
 {
   "name": "electron-asar-hot-updater",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Handles Electron app.asar updates.",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,7 @@
   "author": "leiyswork@gmail.com",
   "license": "MIT",
   "dependencies": {
+    "adm-zip": "^0.4.11",
     "original-fs": "^1.0.0",
     "request": "^2.87.0",
     "request-progress": "^3.0.0"
