@@ -27,7 +27,7 @@ $ npm install --save electron-asar-hot-updater
 Now, inside the *main.js* file, call it like this:
 ```js
 const { app, dialog } = require('electron');
-const EAU = require('@xtalpi/electron-asar-updater');
+const EAU = require('electron-asar-hot-updater');
 
 app.on('ready', function () {
   // Initiate the module
@@ -59,7 +59,6 @@ app.on('ready', function () {
         //         remaining: 81.403       
         //     }
         // }
-        progressBar.value = parseInt(100 * state.percent)
       })
 
       EAU.download(function (error) {
