@@ -111,7 +111,7 @@ app.post('/update', function (req, res) {
   res.end();
 });
 ```
-If you use a zip file, the plug-in will unzip the file after downloading it, which will make your update file smaller (50M - > 10M), but you must make sure that update ASAR is at the root of the zip package.:
+If you use a zip file, the plug-in will unzip the file after downloading it, which will make your update file smaller, but you must make sure that `update.asar` is at the root of the zip package:
 ```
 ── update.zip
    └── update.asar
