@@ -1,36 +1,41 @@
 # electron-asar-hot-updater
-[![NPM](https://nodei.co/npm/electron-asar-hot-updater.png)](https://nodei.co/npm/electron-asar-hot-updater/)
+[![NPM](https://user-gold-cdn.xitu.io/2018/12/17/167ba2fc49bb1b2e?w=384&h=56&f=png&s=4570)](https://nodei.co/npm/electron-asar-hot-updater/)
 
-[中文文档](README-CN.md) | English
+中文文档 | [English](README.md)
 
 ## What it is
-> A NodeJs module for Electron, that handles app.asar updates. Reconstruction of `electron-asar-updater`
 
-## How it works (Read this first)
-* EAU (Electron Asar Updater) was built upon _Electron Application Updater_ to handle the process of updating the app.asar file inside an Electron app ; **it simply replaces the app.asar file (at /resources/) with the new one called "update.asar"!**
-* The check for "updates" must by triggered by the application. **EAU doesn't make any kind of periodic checks on its own**.
-* EAU talks to an API (let's call it so) to tell it if there is a new update.
-    * The API receives a request from EAU with the client's **current version of the application (must be specified inside the application package.json file)**.
-    * The API then responds with the new update, ... or simply *false* to abort.
-    * If there's an update available the API should respond with the *source* for this update **update.asar** file.
-    * EAU then downloads the .asar file, deletes the old app.asar and renames the update.asar to app.asar.
+> 一个用于`electron`的NodeJs模块，用于支持app.asar的更新，基于`electron-asar-updater`重构
 
-## But why ? (use cases)
-* If you think these are too complicated to implement:
+Github: https://github.com/yansenlei/electron-asar-hot-updater
+
+如果`electron-updater`支持差异更新，那应该是最佳选择了，貌似目前正在尝试，期待ing...
+
+## 如何工作 (Read this first)
+* 用于处理更新Electron应用程序内app.asar文件的过程;它只是用名为“update.asar”的新文件替换app.asar文件（在/ resources /）！
+* 检查“更新”必须由应用程序触发。 `EAU`不会自行进行任何形式的定期检查。
+* `EAU`与API进行对话，告诉它是否有新的更新。
+    * API接收来自EAU的请求，其中包含客户端当前版本的应用程序（必须在应用程序package.json文件中指定）
+    * 然后，API以新更新响应，或者只是false以中止。
+    * 如果有可用更新，则API应使用此更新update.asar文件的源进行响应。
+    * EAU然后下载.asar文件，删除旧的app.asar并将update.asar重命名为app.asar。(为了绕开Windows下替换asar存在程序占用的问题，会在关闭Electron应用后启动`updater.exe`，5秒后替换asar)
+
+## 为何要使用它 ? (用例)
+* 如果您认为这些太复杂而无法实施:
 https://www.npmjs.com/package/electron-updater
 http://electron.atom.io/docs/v0.33.0/api/auto-updater/
-* If you don't think it's reasonable to update the hole .app or .exe file (up to 100MB) when you're only changing one file (usually 40MB).
-* If you want to see `progress` when updating.
-* If you want to `check` the version on the `server side` or on the `client side`.
-* If you want to use `zip` to compress files, make your ASAR file smaller.
+* 如果您认为在更换一个文件（通常为40MB），.app或.exe文件（最多100MB）是不合理的。
+* 需要在更新时查看进度。
+* 选择使用服务器端检查或客户端检查。
+* 可以使用zip压缩文件，压缩你的ASAR使其更小。
 
 ---
 
-## Installation
+## 安装
 ```bash
 $ npm install --save electron-asar-hot-updater
 ```
-Now, inside the *main.js* file, call it like this:
+现在，在main.js文件中，调用它如下：
 ```js
 const { app, dialog } = require('electron');
 const EAU = require('electron-asar-hot-updater');
@@ -77,8 +82,8 @@ app.on('ready', function () {
 })
 ```
 
-## The update server
-The server can return the version details, for example
+## 服务端例子
+例如，服务器可以返回版本详细信息
 ```js
 const express = require('express')
 var bodyParser = require('body-parser');
@@ -102,7 +107,7 @@ app.post('/update', function (req, res) {
 app.listen(3000)
 console.log('run port: 3000')
 ```
-Or you can return version information for client to check
+或者您可以返回版本信息供客户端检查
 ```js
 app.post('/update', function (req, res) {
   res.write(JSON.stringify( {
@@ -114,7 +119,7 @@ app.post('/update', function (req, res) {
   res.end();
 });
 ```
-If you use a zip file, the plug-in will unzip the file after downloading it, which will make your update file smaller, but you must make sure that `update.asar` is at the root of the zip package:
+如果您使用zip文件，插件将在下载后解压缩文件，这将使你的更新文件更小，但你必须确保`update.asar`位于zip包的根目录：
 ```
 ── update.zip
    └── update.asar
@@ -122,6 +127,6 @@ If you use a zip file, the plug-in will unzip the file after downloading it, whi
 
 ## License
 
-:smiley: if you have any comments or wish to contribute to this project, you are welcome to submit Issues or PR.
+欢迎提交Issues、PR
 
 MIT - [yansenlei](https://github.com/yansenlei)
