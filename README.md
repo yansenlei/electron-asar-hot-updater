@@ -1,4 +1,8 @@
 # electron-asar-hot-updater
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater?ref=badge_shield)
+[![npm version](https://badge.fury.io/js/electron-asar-hot-updater.svg)](https://badge.fury.io/js/electron-asar-hot-updater)
+
 [![NPM](https://nodei.co/npm/electron-asar-hot-updater.png)](https://nodei.co/npm/electron-asar-hot-updater/)
 
 [中文文档](README-CN.md) | English
