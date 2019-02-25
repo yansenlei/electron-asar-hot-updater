@@ -1,5 +1,6 @@
 # electron-asar-hot-updater
 [![NPM](https://nodei.co/npm/electron-asar-hot-updater.png)](https://nodei.co/npm/electron-asar-hot-updater/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater?ref=badge_shield)
 
 [中文文档](README-CN.md) | English
 
@@ -125,3 +126,5 @@ If you use a zip file, the plug-in will unzip the file after downloading it, whi
 :smiley: if you have any comments or wish to contribute to this project, you are welcome to submit Issues or PR.
 
 MIT - [yansenlei](https://github.com/yansenlei)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater?ref=badge_large)
