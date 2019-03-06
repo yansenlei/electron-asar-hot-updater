@@ -4,7 +4,6 @@ const Utils = require('util')
 const request = require('request')
 const progress = require('request-progress')
 const admZip = require('adm-zip')
-const path = require('path')
 const fs = require('fs')
 
 // Yes, it's weird, but we need the trailing slash after the .asar
