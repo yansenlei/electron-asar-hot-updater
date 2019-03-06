@@ -55,7 +55,7 @@ var Updater = {
    * Init the module
    * */
   init: function (setup) {
-    this.setup = Utils._extend({}, this.setup, setup)
+    this.setup = Utils._extend(this.setup, setup)
 
     this.log('AppPath: ' + AppPath)
     this.log('AppPathFolder: ' + AppPathFolder)
