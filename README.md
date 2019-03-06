@@ -43,7 +43,8 @@ app.on('ready', function () {
   // Initiate the module
   EAU.init({
     'api': 'http://...', // The API EAU will talk to
-    'server': false // Where to check. true: server side, false: client side, default: true.
+    'server': false, // Where to check. true: server side, false: client side, default: true.
+    'debug': false // Default: false.
   });
 
   EAU.check(function (error, last, body) {
