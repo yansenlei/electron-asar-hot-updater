@@ -5,6 +5,7 @@ const request = require('request')
 const progress = require('request-progress')
 const admZip = require('adm-zip')
 const fs = require('fs')
+const crypto = require('crypto')
 
 // Yes, it's weird, but we need the trailing slash after the .asar
 // so we can read paths "inside" it, e.g. the package.json, where we look
@@ -48,7 +49,8 @@ var Updater = {
   update: {
     last: null,
     source: null,
-    file: null
+    file: null,
+    sha1: null
   },
 
   /**
@@ -59,6 +61,16 @@ var Updater = {
 
     this.log('AppPath: ' + AppPath)
     this.log('AppPathFolder: ' + AppPathFolder)
+  },
+
+  /**
+   * Sha1
+   * */
+  sha1: function(buffer) {
+    var fsHash = crypto.createHash('sha1');
+    fsHash.update(buffer);
+    var sha1 = fsHash.digest('hex');
+    return sha1;
   },
 
   /**
@@ -142,6 +154,9 @@ var Updater = {
               if (body.version !== packageInfo.version) {
                 response.source = body.asar
               }
+              if(body.sha1) {
+                response.sha1 = body.sha1
+              }
             }
 
             // If the "last" property is not defined
@@ -186,7 +201,7 @@ var Updater = {
       this.setup.callback = callback
     }
 
-    var url = this.update.source, fileName = 'update.asar'
+    var url = this.update.source, fileName = 'update.asar', update_sha1 = this.update.sha1
 
     this.log('Downloading ' + url)
 
@@ -212,6 +227,15 @@ var Updater = {
               // Success
               Updater.log('Update Zip downloaded: ' + AppPathFolder)
               // Apply the update
+              if(update_sha1) {
+                var buffer = fs.readFileSync(updateFile);
+                var sha1 = Updater.sha1(buffer);
+                if(sha1 !== update_sha1) {
+                  Updater.log('Upload failed! Sha1 code mismatch.')
+                  Updater.end(5)
+                  return false
+                }
+              }
               if (process.platform === 'darwin') {
                 Updater.apply()
               } else {
@@ -240,6 +264,16 @@ var Updater = {
 
               // Success
               Updater.log('Update downloaded: ' + updateFile)
+
+              if(update_sha1) {
+                var buffer = fs.readFileSync(updateFile);
+                var sha1 = Updater.sha1(buffer);
+                if(sha1 !== update_sha1) {
+                  Updater.log('Upload failed! Sha1 code mismatch.')
+                  Updater.end(5)
+                  return false
+                }
+              }
 
               // Apply the update
               if (process.platform === 'darwin') {
