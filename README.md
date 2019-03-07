@@ -1,4 +1,8 @@
 # electron-asar-hot-updater
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyansenlei%2Felectron-asar-hot-updater?ref=badge_shield)
+[![npm version](https://badge.fury.io/js/electron-asar-hot-updater.svg)](https://badge.fury.io/js/electron-asar-hot-updater)
+
 [![NPM](https://nodei.co/npm/electron-asar-hot-updater.png)](https://nodei.co/npm/electron-asar-hot-updater/)
 
 [中文文档](README-CN.md) | English
@@ -39,7 +43,8 @@ app.on('ready', function () {
   // Initiate the module
   EAU.init({
     'api': 'http://...', // The API EAU will talk to
-    'server': false // Where to check. true: server side, false: client side, default: true.
+    'server': false, // Where to check. true: server side, false: client side, default: true.
+    'debug': false // Default: false.
   });
 
   EAU.check(function (error, last, body) {
@@ -109,6 +114,7 @@ app.post('/update', function (req, res) {
     "name": "app",
     "version": "0.0.1",
     "asar": "http://127.0.0.1:8083/update.asar",
+    "sha1": "203448645d8a32b9a08ca9a0eb88006f874d0c78", // Optional, If set, verify `asar` file legitimacy
     "info": "1.fix bug\n2.feat..."
   } ).replace(/[\/]/g, '\\/') );
   res.end();

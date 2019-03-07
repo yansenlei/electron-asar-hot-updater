@@ -4,6 +4,8 @@ const Utils = require('util')
 const request = require('request')
 const progress = require('request-progress')
 const admZip = require('adm-zip')
+const fs = require('fs')
+const crypto = require('crypto')
 
 // Yes, it's weird, but we need the trailing slash after the .asar
 // so we can read paths "inside" it, e.g. the package.json, where we look
@@ -37,7 +39,8 @@ var Updater = {
     logFile: 'updater-log.txt',
     requestOptions: {},
     callback: false,
-    progresscallback: false
+    progresscallback: false,
+    debug: false
   },
 
   /**
@@ -46,7 +49,8 @@ var Updater = {
   update: {
     last: null,
     source: null,
-    file: null
+    file: null,
+    sha1: null
   },
 
   /**
@@ -60,15 +64,29 @@ var Updater = {
   },
 
   /**
+   * Sha1
+   * */
+  sha1: function(buffer) {
+    var fsHash = crypto.createHash('sha1');
+    fsHash.update(buffer);
+    var sha1 = fsHash.digest('hex');
+    return sha1;
+  },
+
+  /**
    * Logging
    * */
   log: function (line) {
     // Log it
-    console.log('Updater: ', line)
+    if(this.setup.debug) {
+      console.log('Updater: ', line)
+    }
 
     // Put it into a file
     if (this.setup.logFile) {
-      console.log('%s + %s + %s', AppPathFolder, this.setup.logFile, line)
+      if(this.setup.debug) {
+        console.log('%s + %s + %s', AppPathFolder, this.setup.logFile, line)
+      }
       FileSystem.appendFileSync(AppPathFolder + this.setup.logFile, line + '\n')
     }
   },
@@ -95,8 +113,12 @@ var Updater = {
     }
 
     // Get the current version
-    debugger
-    var packageInfo = require(AppPath + 'package.json')
+    try{
+      var packageInfo = JSON.parse(fs.readFileSync(AppPath + 'package.json'))
+    } catch(e) {
+      console.error(e)
+    }
+
     this.log(packageInfo.version)
 
     // If the version property not specified
@@ -131,6 +153,9 @@ var Updater = {
               response = { last: body.version }
               if (body.version !== packageInfo.version) {
                 response.source = body.asar
+              }
+              if(body.sha1) {
+                response.sha1 = body.sha1
               }
             }
 
@@ -176,7 +201,7 @@ var Updater = {
       this.setup.callback = callback
     }
 
-    var url = this.update.source, fileName = 'update.asar'
+    var url = this.update.source, fileName = 'update.asar', update_sha1 = this.update.sha1
 
     this.log('Downloading ' + url)
 
@@ -202,6 +227,19 @@ var Updater = {
               // Success
               Updater.log('Update Zip downloaded: ' + AppPathFolder)
               // Apply the update
+              if(update_sha1) {
+                try{
+                  var buffer = FileSystem.readFileSync(updateFile);
+                  var sha1 = Updater.sha1(buffer);
+                  if(sha1 !== update_sha1) {
+                    Updater.log('Upload failed! Sha1 code mismatch.')
+                    Updater.end(5)
+                    return false
+                  }
+                } catch(e) {
+                  Updater.log('sha1_error')
+                }
+              }
               if (process.platform === 'darwin') {
                 Updater.apply()
               } else {
@@ -211,7 +249,7 @@ var Updater = {
               Updater.log('unzip error: ' + error)
             }
           } else {
-            console.log('Upload successful!  Server responded with:')
+            Updater.log('Upload successful!  Server responded with:')
             Updater.log('updateFile: ' + updateFile)
 
             // Create the file
@@ -230,6 +268,20 @@ var Updater = {
 
               // Success
               Updater.log('Update downloaded: ' + updateFile)
+
+              if(update_sha1) {
+                try{
+                  var buffer = FileSystem.readFileSync(updateFile);
+                  var sha1 = Updater.sha1(buffer);
+                  if(sha1 !== update_sha1) {
+                    Updater.log('Upload failed! Sha1 code mismatch.')
+                    Updater.end(5)
+                    return false
+                  }
+                } catch(e) {
+                  Updater.log('sha1_error')
+                }
+              }
 
               // Apply the update
               if (process.platform === 'darwin') {
@@ -267,11 +319,11 @@ var Updater = {
       })
       .on('error', function (err) {
         // Do something with err
-        console.log('Do something with err', err)
+        Updater.log('Do something with err', err)
       })
       .on('end', function (d) {
         // Do something after request finishes
-        console.log('Do something after request finishes', d)
+        Updater.log('Do something after request finishes', d)
       })
   },
 
@@ -356,7 +408,6 @@ var Updater = {
               ' ' +
               appAsar
           )
-          const fs = require('fs')
           fs.writeFileSync(
             WindowsUpdater,
             fs.readFileSync(
