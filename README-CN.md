@@ -115,6 +115,7 @@ app.post('/update', function (req, res) {
     "name": "app",
     "version": "0.0.1",
     "asar": "http://127.0.0.1:8083/update.asar",
+    "sha1": "203448645d8a32b9a08ca9a0eb88006f874d0c78", // 可选项, 如果设置将会验证`asar`文件的合法性
     "info": "1.fix bug\n2.feat..."
   } ).replace(/[\/]/g, '\\/') );
   res.end();

@@ -228,12 +228,16 @@ var Updater = {
               Updater.log('Update Zip downloaded: ' + AppPathFolder)
               // Apply the update
               if(update_sha1) {
-                var buffer = fs.readFileSync(updateFile);
-                var sha1 = Updater.sha1(buffer);
-                if(sha1 !== update_sha1) {
-                  Updater.log('Upload failed! Sha1 code mismatch.')
-                  Updater.end(5)
-                  return false
+                try{
+                  var buffer = FileSystem.readFileSync(updateFile);
+                  var sha1 = Updater.sha1(buffer);
+                  if(sha1 !== update_sha1) {
+                    Updater.log('Upload failed! Sha1 code mismatch.')
+                    Updater.end(5)
+                    return false
+                  }
+                } catch(e) {
+                  Updater.log('sha1_error')
                 }
               }
               if (process.platform === 'darwin') {
@@ -266,12 +270,16 @@ var Updater = {
               Updater.log('Update downloaded: ' + updateFile)
 
               if(update_sha1) {
-                var buffer = fs.readFileSync(updateFile);
-                var sha1 = Updater.sha1(buffer);
-                if(sha1 !== update_sha1) {
-                  Updater.log('Upload failed! Sha1 code mismatch.')
-                  Updater.end(5)
-                  return false
+                try{
+                  var buffer = FileSystem.readFileSync(updateFile);
+                  var sha1 = Updater.sha1(buffer);
+                  if(sha1 !== update_sha1) {
+                    Updater.log('Upload failed! Sha1 code mismatch.')
+                    Updater.end(5)
+                    return false
+                  }
+                } catch(e) {
+                  Updater.log('sha1_error')
                 }
               }
 
