@@ -119,11 +119,14 @@ app.post('/update', function (req, res) {
   res.end();
 });
 ```
+## 让更新包更小
 如果您使用zip文件，插件将在下载后解压缩文件，这将使你的更新文件更小，但你必须确保`update.asar`位于zip包的根目录：
 ```
 ── update.zip
    └── update.asar
 ```
+## Windows更新
+updater.exe是一个非常简单的C＃控制台应用程序，使用[Mono]（http://www.mono-project.com）编译 [源码](./updater.cs)。来自 [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2)
 
 ## License
 

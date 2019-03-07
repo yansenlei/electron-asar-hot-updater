@@ -120,6 +120,13 @@ If you use a zip file, the plug-in will unzip the file after downloading it, whi
    └── update.asar
 ```
 
+Now uses a really dumb-but-simple .exe to update
+
+This is to get around the fact that the prompt text from the timeout command was always being shown, even when redirecting to NUL
+
+The updater.exe is a really simple C# console app, compiled with [Mono](http://www.mono-project.com).
+[Source code](./updater.cs). from [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2).
+
 ## License
 
 :smiley: if you have any comments or wish to contribute to this project, you are welcome to submit Issues or PR.
