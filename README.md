@@ -7,6 +7,8 @@
 
 [中文文档](README-CN.md) | English
 
+[Update demo](https://github.com/yansenlei/asar-update-project)
+
 ## What it is
 > A NodeJs module for Electron, that handles app.asar updates. Reconstruction of `electron-asar-updater`
 
