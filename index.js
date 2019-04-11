@@ -400,13 +400,16 @@ var Updater = {
         )
 
         if (process.platform === 'win32') {
+          let executable = process.execPath;
           Updater.log(
             'Going to start the windows updater:' +
               WindowsUpdater +
               ' ' +
               updateAsar +
               ' ' +
-              appAsar
+              appAsar +
+              ' ' +
+              executable
           )
           fs.writeFileSync(
             WindowsUpdater,
@@ -416,7 +419,7 @@ var Updater = {
           )
 
           // JSON.stringify() calls mean we're correctly quoting paths with spaces
-          winArgs = `${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)}`
+          winArgs = `${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)} ${JSON.stringify(executable)}`
           Updater.log(winArgs)
           // and the windowsVerbatimArguments options argument, in combination with the /s switch, stops windows stripping quotes from our commandline
 

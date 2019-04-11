@@ -6,6 +6,8 @@
 // Waits 5 seconds, then will move source to destination, as long as source exists
 
 using System;
+using System.Diagnostics;
+using System.ComponentModel;
 
 public class CommandLine
 {
@@ -13,15 +15,14 @@ public class CommandLine
   {
     string updateAsar = "";
     string appAsar = "";
-    
+  
     // wait for the Electron app to close (5 secs)
     System.Threading.Thread.Sleep(5000);
-    
-    if (args.Length == 2) 
+    if (args.Length >= 2) 
     {
       updateAsar = args[0];
       appAsar    = args[1];
-      
+     
       System.IO.FileInfo fileInfoSrc = new System.IO.FileInfo(updateAsar);
       System.IO.FileInfo fileInfoDest = new System.IO.FileInfo(appAsar);
       
@@ -37,6 +38,19 @@ public class CommandLine
       {
           System.IO.File.Move(updateAsar,appAsar);                 
       }
+
+      if (args.Length == 3) {
+        Process appProcess = new Process();
+        try
+        {
+          appProcess.StartInfo.FileName = args[2];
+          appProcess.Start();
+        }
+        catch (Exception e)
+        {
+          Console.WriteLine(e.Message);
+        }
+      }
     } 
     // we need two filepaths - the update.asar and the app.asar
     else 
@@ -45,3 +59,4 @@ public class CommandLine
     }
   }
 }
+
