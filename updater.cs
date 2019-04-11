@@ -8,11 +8,23 @@
 using System;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 public class CommandLine
 {
+  [DllImport("kernel32.dll")]
+  static extern IntPtr GetConsoleWindow();
+
+  [DllImport("user32.dll")]
+  static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+  const int SW_HIDE = 0;
   public static void Main(string[] args)
   {
+    // Hide this console window
+    var handle = GetConsoleWindow();
+    ShowWindow(handle, 0);
+
     string updateAsar = "";
     string appAsar = "";
   
