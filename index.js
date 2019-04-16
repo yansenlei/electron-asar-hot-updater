@@ -399,8 +399,9 @@ var Updater = {
           'Going to shell out to move: ' + updateAsar + ' to: ' + AppAsar
         )
 
+        let executable = process.execPath;
+        const { spawn } = require('child_process')
         if (process.platform === 'win32') {
-          let executable = process.execPath;
           Updater.log(
             'Going to start the windows updater:' +
               WindowsUpdater +
@@ -423,8 +424,6 @@ var Updater = {
           Updater.log(winArgs)
           // and the windowsVerbatimArguments options argument, in combination with the /s switch, stops windows stripping quotes from our commandline
 
-          // This doesn't work:
-          const { spawn } = require('child_process')
           // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'});
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
           spawn('cmd', ['/s', '/c', '"' + winArgs + '"'], {
@@ -436,8 +435,7 @@ var Updater = {
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
-          //
-          child.spawn('bash', ['-c', ['cd ' + JSON.stringify(AppPathFolder), 'mv -f update.asar app.asar'].join(' && ')], {detached: true});
+          spawn("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), "mv -f update.asar app.asar", executable].join(" && ")],{ detached: true });
         }
       } catch (error) {
         Updater.log('Shelling out to move failed: ' + error)

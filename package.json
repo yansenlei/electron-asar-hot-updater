@@ -1,6 +1,6 @@
 {
   "name": "electron-asar-hot-updater",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Handles Electron app.asar updates.",
   "main": "index.js",
   "scripts": {
