@@ -45,7 +45,13 @@ app.on('ready', function () {
   EAU.init({
     'api': 'http://...', // The API EAU will talk to
     'server': false, // Where to check. true: server side, false: client side, default: true.
-    'debug': false // Default: false.
+    'debug': false, // Default: false.
+    'headers': { Authorization: 'token' }, // Default: {}
+    'body': {
+      name: packageInfo.name,
+      current: packageInfo.version
+    }, // Default: name and the current version
+    'formatRes': function(res) { return res } // 对返回的数据进行格式化操作的回调函数，保证EAU可以正常操作操作数据。比如格式化后返回：{version: xx, asar: xx}
   });
 
   EAU.check(function (error, last, body) {
@@ -76,7 +82,13 @@ app.on('ready', function () {
         dialog.showErrorBox('info', error)
         return false
       }
-      dialog.showErrorBox('info', 'App updated successfully! Restart it please.')
+      // dialog.showErrorBox('info', 'App updated successfully! Restart it please.')
+      if (process.platform === 'darwin') {
+        app.relaunch()
+        app.quit()
+      } else {
+        app.quit()
+      }
     })
 
   })
@@ -121,14 +133,16 @@ app.post('/update', function (req, res) {
   res.end();
 });
 ```
+
 ## 让更新包更小
 如果您使用zip文件，插件将在下载后解压缩文件，这将使你的更新文件更小，但你必须确保`update.asar`位于zip包的根目录：
 ```
 ── update.zip
    └── update.asar
 ```
+
 ## Windows更新
-updater.exe是一个非常简单的C＃控制台应用程序，使用[Mono]（http://www.mono-project.com）编译 [源码](./updater.cs)。来自 [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2)
+updater.exe是一个非常简单的C＃控制台应用程序，使用[Mono]（http://www.mono-project.com）编译 [源码](./updater.cs)。来自 [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2)。如果客户机系统版本是win7，可能需要先手动安装[.Net framework](https://dotnet.microsoft.com/download/dotnet-framework)。
 
 ## License
 

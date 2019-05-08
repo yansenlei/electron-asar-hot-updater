@@ -13,9 +13,8 @@ const crypto = require('crypto')
 const AppPath = app.getAppPath() + '/'
 const AppPathFolder = AppPath.slice(0, AppPath.indexOf('app.asar'))
 const AppAsar = AppPath.slice(0, -1)
-const WindowsUpdater =
-  AppPath.slice(0, AppPath.indexOf('resources')) + 'updater.exe'
-
+const WindowsUpdater = AppPath.slice(0, AppPath.indexOf('resources')) + 'updater.exe'
+const UPDATE_FILE = 'update.asar'
 const errors = [
   'version_not_specified',
   'cannot_connect_to_api',
@@ -34,13 +33,16 @@ var Updater = {
    * */
   setup: {
     api: null,
+    body: null,
+    headers: null,
     token: null,
     server: true,
     logFile: 'updater-log.txt',
     requestOptions: {},
     callback: false,
     progresscallback: false,
-    debug: false
+    debug: false,
+    formatRes: function(res) { return res }
   },
 
   /**
@@ -67,10 +69,10 @@ var Updater = {
    * Sha1
    * */
   sha1: function(buffer) {
-    var fsHash = crypto.createHash('sha1');
-    fsHash.update(buffer);
-    var sha1 = fsHash.digest('hex');
-    return sha1;
+    var fsHash = crypto.createHash('sha1')
+    fsHash.update(buffer)
+    var sha1 = fsHash.digest('hex')
+    return sha1
   },
 
   /**
@@ -136,7 +138,7 @@ var Updater = {
         url: this.setup.api,
         method: 'post',
         json: true,
-        body: {
+        body: this.setup.body || {
           name: packageInfo.name,
           current: packageInfo.version
         },
@@ -145,11 +147,17 @@ var Updater = {
       function (error, res, body) {
         if (!error) {
           try {
+            body = Updater.setup.formatRes(body)
             let response = {}
 
             if (Updater.setup.server) {
               response = body
             } else {
+              if (!body.version || !body.asar) {
+                Updater.log('body.version and body.asar is required')
+                Updater.end(3)
+                return false
+              }
               response = { last: body.version }
               if (body.version !== packageInfo.version) {
                 response.source = body.asar
@@ -201,7 +209,7 @@ var Updater = {
       this.setup.callback = callback
     }
 
-    var url = this.update.source, fileName = 'update.asar', update_sha1 = this.update.sha1
+    var url = this.update.source, update_sha1 = this.update.sha1
 
     this.log('Downloading ' + url)
 
@@ -215,8 +223,8 @@ var Updater = {
           if (error) {
             return console.error('err')
           }
-          var updateFile = AppPathFolder + fileName
-          if (response.headers['content-type'].indexOf('zip') > -1) {
+          var updateFile = AppPathFolder + UPDATE_FILE
+          if (response.headers['content-type'].includes('zip')) {
             Updater.log('ZipFilePath: ' + AppPathFolder)
             try {
               const zip = new admZip(body)
@@ -229,8 +237,8 @@ var Updater = {
               // Apply the update
               if(update_sha1) {
                 try{
-                  var buffer = FileSystem.readFileSync(updateFile);
-                  var sha1 = Updater.sha1(buffer);
+                  var buffer = FileSystem.readFileSync(updateFile)
+                  var sha1 = Updater.sha1(buffer)
                   if(sha1 !== update_sha1) {
                     Updater.log('Upload failed! Sha1 code mismatch.')
                     Updater.end(5)
@@ -271,8 +279,8 @@ var Updater = {
 
               if(update_sha1) {
                 try{
-                  var buffer = FileSystem.readFileSync(updateFile);
-                  var sha1 = Updater.sha1(buffer);
+                  var buffer = FileSystem.readFileSync(updateFile)
+                  var sha1 = Updater.sha1(buffer)
                   if(sha1 !== update_sha1) {
                     Updater.log('Upload failed! Sha1 code mismatch.')
                     Updater.end(5)
@@ -334,42 +342,28 @@ var Updater = {
   },
 
   /**
-   * Apply the update, remove app.asar and rename update.zip to app.asar
+   * Apply the update, remove app.asar and rename UPDATE_FILE to app.asar
    * */
   apply: function () {
     try {
       this.log('Going to unlink: ' + AppPath.slice(0, -1))
 
-      FileSystem.unlink(AppPath.slice(0, -1), function (err) {
-        if (err) {
-          Updater.log("Couldn't unlink: " + AppPath.slice(0, -1))
-          return console.error(err)
-        }
-        Updater.log('Asar deleted successfully.')
-      })
+      FileSystem.unlinkSync(AppPath.slice(0, -1))
+      this.log('Asar deleted successfully.')
     } catch (error) {
       this.log('Delete error: ' + error)
 
       // Failure
       this.end(6)
+      return false
     }
 
     try {
       this.log(
         'Going to rename: ' + this.update.file + ' to: ' + AppPath.slice(0, -1)
       )
-      FileSystem.rename(this.update.file, AppPath.slice(0, -1), function (err) {
-        if (err) {
-          Updater.log(
-            "Couldn't rename: " +
-              Updater.update.file +
-              ' to: ' +
-              AppPath.slice(0, -1)
-          )
-          return console.error(err)
-        }
-        Updater.log('Update applied.')
-      })
+      FileSystem.renameSync(this.update.file, AppPath.slice(0, -1))
+      this.log('Update applied.')
 
       this.log('End of update.')
       // Success
@@ -379,6 +373,7 @@ var Updater = {
 
       // Failure
       this.end(6)
+      return false
     }
   },
 
@@ -386,7 +381,7 @@ var Updater = {
   // way of replacing it. This should get called after the main Electron
   // process has quit. Win32 calls 'move' and other platforms call 'mv'
   mvOrMove: function (child) {
-    var updateAsar = AppPathFolder + 'update.asar'
+    var updateAsar = AppPathFolder + UPDATE_FILE
     var appAsar = AppPathFolder + 'app.asar'
     var winArgs = ''
 
@@ -399,7 +394,7 @@ var Updater = {
           'Going to shell out to move: ' + updateAsar + ' to: ' + AppAsar
         )
 
-        let executable = process.execPath;
+        let executable = process.execPath
         const { spawn } = require('child_process')
         if (process.platform === 'win32') {
           Updater.log(
@@ -424,21 +419,23 @@ var Updater = {
           Updater.log(winArgs)
           // and the windowsVerbatimArguments options argument, in combination with the /s switch, stops windows stripping quotes from our commandline
 
-          // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'});
+          // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'})
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
           spawn('cmd', ['/s', '/c', '"' + winArgs + '"'], {
             detached: true,
             windowsVerbatimArguments: true,
             stdio: 'ignore'
           })
-          app.quit()
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
-          spawn("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), "mv -f update.asar app.asar", executable].join(" && ")],{ detached: true });
+          spawn("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true })
         }
+        // "Updater.end()" will trigger a callback, exec app.quit() in the callback.
+        Updater.end()
       } catch (error) {
         Updater.log('Shelling out to move failed: ' + error)
+        Updater.end(6)
       }
     } catch (error) {
       Updater.log("Couldn't see an " + updateAsar + ' error was: ' + error)

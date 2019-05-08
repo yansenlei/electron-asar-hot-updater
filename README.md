@@ -46,7 +46,13 @@ app.on('ready', function () {
   EAU.init({
     'api': 'http://...', // The API EAU will talk to
     'server': false, // Where to check. true: server side, false: client side, default: true.
-    'debug': false // Default: false.
+    'debug': false, // Default: false.
+    'headers': { Authorization: 'token' }, // Default: {}
+    'body': {
+      name: packageInfo.name,
+      current: packageInfo.version
+    }, // Default: name and the current version
+    'formatRes': function(res) { return res } // Optional,Format the EAU.check response body, exemple => {version: xx, asar: xx}
   });
 
   EAU.check(function (error, last, body) {
@@ -77,7 +83,13 @@ app.on('ready', function () {
         dialog.showErrorBox('info', error)
         return false
       }
-      dialog.showErrorBox('info', 'App updated successfully! Restart it please.')
+      // dialog.showErrorBox('info', 'App updated successfully! Restart it please.')
+      if (process.platform === 'darwin') {
+        app.relaunch()
+        app.quit()
+      } else {
+        app.quit()
+      }
     })
 
   })
@@ -133,7 +145,7 @@ Now uses a really dumb-but-simple .exe to update
 This is to get around the fact that the prompt text from the timeout command was always being shown, even when redirecting to NUL
 
 The updater.exe is a really simple C# console app, compiled with [Mono](http://www.mono-project.com).
-[Source code](./updater.cs). from [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2).
+[Source code](./updater.cs). from [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2). If the user system version is win7, you may need to manually install [.Net framework](https://dotnet.microsoft.com/download/dotnet-framework) first.
 
 ## License
 
