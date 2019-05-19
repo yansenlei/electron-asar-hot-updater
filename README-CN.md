@@ -21,10 +21,10 @@ Github: https://github.com/yansenlei/electron-asar-hot-updater
     * EAU然后下载.asar文件，删除旧的app.asar并将update.asar重命名为app.asar。(为了绕开Windows下替换asar存在程序占用的问题，会在关闭Electron应用后启动`updater.exe`，5秒后替换asar)
 
 ## 为何要使用它 ? (用例)
-* 如果您认为这些太复杂而无法实施:
+* 如果你认为这些太复杂而无法实施:
 https://www.npmjs.com/package/electron-updater
 http://electron.atom.io/docs/v0.33.0/api/auto-updater/
-* 如果您认为在更换一个文件（通常为40MB），.app或.exe文件（最多100MB）是不合理的。
+* 如果你认为在更换一个文件（通常为40MB），.app或.exe文件（最多100MB）是不合理的。
 * 需要在更新时查看进度。
 * 选择使用服务器端检查或客户端检查。
 * 可以使用zip压缩文件，压缩你的ASAR使其更小。
@@ -120,7 +120,7 @@ app.post('/update', function (req, res) {
 app.listen(3000)
 console.log('run port: 3000')
 ```
-或者您可以返回版本信息供客户端检查
+或者你可以返回版本信息供客户端检查
 ```js
 app.post('/update', function (req, res) {
   res.write(JSON.stringify( {
@@ -135,14 +135,14 @@ app.post('/update', function (req, res) {
 ```
 
 ## 让更新包更小
-如果您使用zip文件，插件将在下载后解压缩文件，这将使你的更新文件更小，但你必须确保`update.asar`位于zip包的根目录：
+如果你使用zip文件，插件将在下载后解压缩文件，这将使你的更新文件更小，但你必须确保`update.asar`位于zip包的根目录：
 ```
 ── update.zip
    └── update.asar
 ```
 
 ## Windows更新
-updater.exe是一个非常简单的C＃控制台应用程序，使用[Mono]（http://www.mono-project.com）编译 [源码](./updater.cs)。来自 [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2)。如果客户机系统版本是win7，可能需要先手动安装[.Net framework](https://dotnet.microsoft.com/download/dotnet-framework)。
+updater.exe是一个非常简单的C＃控制台应用程序，使用[Mono](http://www.mono-project.com) 编译 [源码](./updater.cs)。来自 [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2)。如果客户机系统版本是win7，可能需要先手动安装[.Net framework](https://dotnet.microsoft.com/download/dotnet-framework)。
 
 ## License
 
