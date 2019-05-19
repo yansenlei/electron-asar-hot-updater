@@ -23,6 +23,7 @@
     "adm-zip": "^0.4.11",
     "original-fs": "^1.0.0",
     "request": "^2.87.0",
-    "request-progress": "^3.0.0"
+    "request-progress": "^3.0.0",
+    "semver-diff": "^3.0.0"
   }
 }

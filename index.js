@@ -6,6 +6,7 @@ const progress = require('request-progress')
 const admZip = require('adm-zip')
 const fs = require('fs')
 const crypto = require('crypto')
+const semverDiff = require('semver-diff')
 
 // Yes, it's weird, but we need the trailing slash after the .asar
 // so we can read paths "inside" it, e.g. the package.json, where we look
@@ -159,7 +160,7 @@ var Updater = {
                 return false
               }
               response = { last: body.version }
-              if (body.version !== packageInfo.version) {
+              if (semverDiff(packageInfo.version, body.version)) {
                 response.source = body.asar
               }
               if(body.sha1) {
