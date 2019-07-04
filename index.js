@@ -90,7 +90,7 @@ var Updater = {
       if(this.setup.debug) {
         console.log('%s + %s + %s', AppPathFolder, this.setup.logFile, line)
       }
-      FileSystem.appendFileSync(AppPathFolder + this.setup.logFile, line + '\n')
+      FileSystem.appendFileSync(AppPathFolder + this.setup.logFile, new Date().toLocaleString() + ' > ' + line + '\n')
     }
   },
 
@@ -408,12 +408,17 @@ var Updater = {
               ' ' +
               executable
           )
-          fs.writeFileSync(
-            WindowsUpdater,
-            fs.readFileSync(
-              `${AppPathFolder}app.asar/node_modules/${require('./package.json').name}/updater.exe`
+
+          try {
+            fs.writeFileSync(
+              WindowsUpdater,
+              fs.readFileSync(
+                `${AppPathFolder}app.asar/node_modules/${require('./package.json').name}/updater.exe`
+              )
             )
-          )
+          } catch (error) {
+            Updater.log('Write updater.exe Error: ' + error)
+          }
 
           // JSON.stringify() calls mean we're correctly quoting paths with spaces
           winArgs = `${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)} ${JSON.stringify(executable)}`
