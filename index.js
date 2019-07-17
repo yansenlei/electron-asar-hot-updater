@@ -225,7 +225,8 @@ var Updater = {
             return console.error('err')
           }
           var updateFile = AppPathFolder + UPDATE_FILE
-          if (response.headers['content-type'].includes('zip')) {
+          var contentType = response.headers['content-type']
+          if (contentType && contentType.indexOf('zip') > -1) {
             Updater.log('ZipFilePath: ' + AppPathFolder)
             try {
               const zip = new admZip(body)
