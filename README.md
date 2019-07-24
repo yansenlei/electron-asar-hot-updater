@@ -58,6 +58,7 @@ app.on('ready', function () {
   EAU.check(function (error, last, body) {
     if (error) {
       if (error === 'no_update_available') { return false; }
+      if (error === 'version_not_specified' && process.env.NODE_ENV === 'development') { return false } // Don't worry about this error when developing
       dialog.showErrorBox('info', error)
       return false
     }
