@@ -139,7 +139,8 @@ var Updater = {
           name: packageInfo.name,
           current: packageInfo.version
         },
-        headers: this.setup.headers || {}
+        headers: this.setup.headers || {},
+        ...requestOptions
       },
       function (error, res, body) {
         if (!error) {
@@ -214,7 +215,8 @@ var Updater = {
       request(
         {
           uri: url,
-          encoding: null
+          encoding: null,
+          ...requestOptions
         },
         function (error, response, body) {
           if (error) {

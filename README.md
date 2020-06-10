@@ -148,6 +148,16 @@ This is to get around the fact that the prompt text from the timeout command was
 The updater.exe is a really simple C# console app, compiled with [Mono](http://www.mono-project.com).
 [Source code](./updater.cs). from [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2). If the user system version is win7, you may need to manually install [.Net framework](https://dotnet.microsoft.com/download/dotnet-framework) first.
 
+## config request options
+
+EAU use `request` module to http request. Users can set [request options](https://github.com/request/request#requestoptions-callback) like:
+
+```
+EAU.init({requestOptions: {
+  timeout: 10000
+}})
+```
+
 ## License
 
 :smiley: if you have any comments or wish to contribute to this project, you are welcome to submit Issues or PR.
