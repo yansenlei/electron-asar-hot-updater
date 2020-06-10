@@ -140,7 +140,7 @@ var Updater = {
           current: packageInfo.version
         },
         headers: this.setup.headers || {},
-        ...requestOptions
+        ...this.setup.requestOptions
       },
       function (error, res, body) {
         if (!error) {
@@ -216,10 +216,11 @@ var Updater = {
         {
           uri: url,
           encoding: null,
-          ...requestOptions
+          ...this.setup.requestOptions
         },
         function (error, response, body) {
           if (error) {
+            Updater.end(5)
             return console.error('err')
           }
           var updateFile = AppPathFolder + UPDATE_FILE
