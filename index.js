@@ -5,6 +5,7 @@ const request = require('request')
 const progress = require('request-progress')
 const admZip = require('adm-zip')
 const fs = require('fs')
+const path = require('path')
 const crypto = require('crypto')
 const semverDiff = require('semver-diff')
 const log = require('electron-log')
@@ -222,7 +223,7 @@ var Updater = {
           if (error) {
             return console.error('err')
           }
-          var updateFile = AppPathFolder + UPDATE_FILE
+          var updateFile = this.getUpdateFile();
           var contentType = response.headers['content-type']
           if (contentType && contentType.indexOf('zip') > -1) {
             Updater.log('ZipFilePath: ' + AppPathFolder)
@@ -335,6 +336,10 @@ var Updater = {
       })
   },
 
+  getUpdateFile: function(){
+    return path.join(app.getPath('userData'), UPDATE_FILE);
+  },
+
   progress: function (callback) {
     if (callback) {
       this.setup.progresscallback = callback
@@ -381,7 +386,7 @@ var Updater = {
   // way of replacing it. This should get called after the main Electron
   // process has quit. Win32 calls 'move' and other platforms call 'mv'
   mvOrMove: function (child) {
-    var updateAsar = AppPathFolder + UPDATE_FILE
+    var updateAsar = this.getUpdateFile();
     var appAsar = AppPathFolder + 'app.asar'
     var winArgs = ''
 
@@ -434,7 +439,7 @@ var Updater = {
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
-          spawn("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true })
+          spawn("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${updateAsar} app.asar`, executable].join(" && ")],{ detached: true })
         }
         // "Updater.end()" will trigger a callback, exec app.quit() in the callback.
         Updater.end()
