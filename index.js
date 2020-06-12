@@ -44,7 +44,8 @@ var Updater = {
     callback: false,
     progresscallback: false,
     debug: false,
-    formatRes: function(res) { return res }
+    formatRes: function(res) { return res },
+    formatPackageInfo: function(pi) { return pi },
   },
 
   /**
@@ -114,6 +115,7 @@ var Updater = {
     // Get the current version
     try{
       var packageInfo = JSON.parse(fs.readFileSync(AppPath + 'package.json'))
+      packageInfo = this.setup.formatPackageInfo(packageInfo);
     } catch(e) {
       console.error(e)
     }
