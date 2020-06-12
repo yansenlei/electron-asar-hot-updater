@@ -139,7 +139,8 @@ var Updater = {
           name: packageInfo.name,
           current: packageInfo.version
         },
-        headers: this.setup.headers || {}
+        headers: this.setup.headers || {},
+        ...this.setup.requestOptions
       },
       function (error, res, body) {
         if (!error) {
@@ -214,10 +215,12 @@ var Updater = {
       request(
         {
           uri: url,
-          encoding: null
+          encoding: null,
+          ...this.setup.requestOptions
         },
         function (error, response, body) {
           if (error) {
+            Updater.end(5)
             return console.error('err')
           }
           var updateFile = AppPathFolder + UPDATE_FILE
@@ -414,6 +417,7 @@ var Updater = {
               )
             )
           } catch (error) {
+            this.end(6, error.name)
             Updater.log('Write updater.exe Error: ' + error)
           }
 
@@ -424,11 +428,15 @@ var Updater = {
 
           // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'})
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
-          spawn('cmd', ['/s', '/c', '"' + winArgs + '"'], {
+          let updaterExec = spawn('cmd', ['/s', '/c', '"' + winArgs + '"'], {
             detached: true,
             windowsVerbatimArguments: true,
             stdio: 'ignore'
           })
+          updaterExec.stderr.on('data', (data) => {
+            this.end(6, data)
+            console.log(`updaterExec stderr: ${data}`);
+          });
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
@@ -442,6 +450,20 @@ var Updater = {
       }
     } catch (error) {
       Updater.log("Couldn't see an " + updateAsar + ' error was: ' + error)
+    }
+  },
+
+  checkUpdateResult: function() {
+    if (process.platform === 'win32') {
+      try {
+        return fs.readFileSync(
+          `${AppPathFolder}updater.log`
+        )
+      }catch (error) {
+        return error
+      }
+    } else {
+      return 'Current platform not supported.'
     }
   }
 }

@@ -142,7 +142,21 @@ app.post('/update', function (req, res) {
 ```
 
 ## Windows更新
-updater.exe是一个非常简单的C＃控制台应用程序，使用[Mono](http://www.mono-project.com) 编译 [源码](./updater.cs)。来自 [electron-asar-updater pull #2](https://github.com/whitesmith/electron-asar-updater/pull/2)。如果客户机系统版本是win7，可能需要先手动安装[.Net framework](https://dotnet.microsoft.com/download/dotnet-framework)。
+updater.exe是一个非常简单的 golang 控制台应用程序（为了解决原c#版本在 win7 上依赖 .net framework 的问题），进入 updater 目录后使用如下命令进行编译：
+
+```
+GOOS=windows GOARCH=386 go build -ldflags "-s -w -H=windowsgui" -o updater.exe
+```
+
+## 设置请求参数
+
+EAU使用了 `request` 模块进行http请求. 用户可以参考下例方式设置 [请求参数](https://github.com/request/request#requestoptions-callback) :
+
+```
+EAU.init({requestOptions: {
+  timeout: 10000
+}})
+```
 
 ## License
 
